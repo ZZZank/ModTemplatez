@@ -1,3 +1,21 @@
+// welcome
+//
+// see ./gradle/scripts/dependencies.gradle for dependency management
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
 plugins {
     id "dev.architectury.loom" version "1.7-SNAPSHOT"
     id "maven-publish"
@@ -7,7 +25,7 @@ plugins {
 apply from: 'gradle/scripts/helpers.gradle'
 
 base {
-    archivesName = project.archives_base_name
+    archivesName = "${archives_base_name}-${minecraft_version}"
 }
 
 version = project.mod_version
@@ -41,14 +59,6 @@ loom {
         // in SRG mapped ("func_" / "field_" with MCP class names) to work!
         // (both of these things may be subject to change in the future)
     }
-}
-
-repositories {
-    // Add repositories to retrieve artifacts from in here.
-    // You should only use this when depending on other mods because
-    // Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
-    // See https://docs.gradle.org/current/userguide/declaring_repositories.html
-    // for more information about repositories.
 }
 
 dependencies {
@@ -86,7 +96,7 @@ dependencies {
 
 processResources {
     // define properties that can be used during resource processing
-    inputs.property "version", project.version
+    inputs.property("version", project.version)
 
     // this will replace the property "${version}" in your mods.toml
     // with the version you've defined in your gradle.properties
@@ -111,13 +121,14 @@ tasks.withType(JavaCompile) {
     // If Javadoc is generated, this must be specified in that task too.
     options.encoding = "UTF-8"
 
+    // very few developers will provide source jar when publishing mods, we add param names in production jar
+    // to make life easier for those whose mod depend on this mod
+    options.compilerArgs << '-parameters'
+
     // The Minecraft launcher currently installs Java 8 for users, so your mod probably wants to target Java 8 too
     // JDK 9 introduced a new way of specifying this that will make sure no newer classes or methods are used.
     // We'll use that if it's available, but otherwise we'll use the older option.
-    def targetVersion = 8
-    if (JavaVersion.current().isJava9Compatible()) {
-        options.release = targetVersion
-    }
+    options.release = 8
 }
 
 java {
