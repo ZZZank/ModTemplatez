@@ -88,7 +88,16 @@ processResources {
     // this will replace the property "${version}" in your mods.toml
     // with the version you've defined in your gradle.properties
     filesMatching("META-INF/mods.toml") {
-        expand "version": project.version
+        expand(
+            "version": project.version,
+            "forge_version": forge_version,
+            "loader_version_range": loader_version_range,
+            "license": license,
+            "mod_id": mod_id,
+            "mod_display_name": mod_display_name,
+            "mod_author": mod_author,
+            "minecraft_version": minecraft_version
+        )
     }
 }
 
