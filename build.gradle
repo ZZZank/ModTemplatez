@@ -4,6 +4,8 @@ plugins {
     id "idea"
 }
 
+apply from: 'gradle/scripts/helpers.gradle'
+
 base {
     archivesName = project.archives_base_name
 }
@@ -27,7 +29,7 @@ loom {
         // specify the mixin configs used in this mod
         // this will be added to the jar manifest as well!
         mixinConfigs = [
-                "examplemod.mixins.json"
+            "examplemod.mixins.json"
         ]
 
         // missing access transformers?
@@ -58,27 +60,28 @@ dependencies {
     // mojang's official mappings, or feel free
     // to add your own mappings here (how about
     // mojmap layered with parchment, for example?)
-    mappings loom.officialMojangMappings()
+    def mappingType = "${mapping_type}"
+    if (mappingType == "official") {
+        mappings loom.officialMojangMappings()
+    } else if (mappingType == 'parchment') {
+        mappings(loom.layered {
+            officialMojangMappings()
+            parchment("org.parchmentmc.data:parchment-${parchment_version}")
+        })
+    } else if (mappingType == 'yarn') {
+        mappings("net.fabricmc:yarn:${yarn_version}:v2")
+    } else {
+        throw new IllegalArgumentException("mapping type '${mappingType}' not one of: official, parchment, yarn")
+    }
 
-    // uncomment this if you want to use yarn mappings
-    // mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+    forge "net.minecraftforge:forge:${minecraft_version}-${project.forge_version}"
 
-    // your forge dependency, this is **required** when using Forge Loom in forge mode!
-    forge "net.minecraftforge:forge:${project.forge_version}"
-
-    // additional dependencies can be specified using loom's regular format
-    // specifying a "mod" dependency (like modImplementation or modApi)
-    // will cause loom to remap the file to your specified mappings
-
-    // in this example, we'll be adding JEI as a dependency
-    // according to their developer example on GitHub
-    // see: https://github.com/mezz/JustEnoughItems/wiki/Getting-Started
-    // compile against the JEI API but do not include it at runtime
-    // don't worry about loom "not finding a forge mod" here,
-    // JEI's api just doesn't have any class with an @Mod annotation
-    // modCompileOnly "mezz.jei:jei-1.16.5:${jei_version}:api"
-    // at runtime, use the full JEI jar
-    // modRuntimeOnly "mezz.jei:jei-1.16.5:${jei_version}"
+    if (propertyBool('use_lombok')) {
+        compileOnly("org.projectlombok:lombok:${lombok_version}")
+        annotationProcessor("org.projectlombok:lombok:${lombok_version}")
+        testCompileOnly("org.projectlombok:lombok:${lombok_version}")
+        testAnnotationProcessor("org.projectlombok:lombok:${lombok_version}")
+    }
 }
 
 processResources {
