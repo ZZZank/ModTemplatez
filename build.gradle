@@ -17,6 +17,7 @@
 
 
 plugins {
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
     id "dev.architectury.loom" version "1.7-SNAPSHOT"
     id "maven-publish"
     id "idea"
@@ -59,6 +60,11 @@ loom {
         // in SRG mapped ("func_" / "field_" with MCP class names) to work!
         // (both of these things may be subject to change in the future)
     }
+}
+
+configurations {
+    shade
+    implementation.extendsFrom shade
 }
 
 dependencies {
@@ -152,6 +158,22 @@ jar {
         ])
     }
 }
+
+shadowJar {
+    archiveClassifier.set("dev-shadow")
+
+    //here you can relocate packages
+//    relocate("io.github.classgraph", "zzzank.probejs.shaded.classgraph")
+
+    configurations = [project.configurations.shade]
+}
+
+remapJar {
+    setInput(shadowJar.archiveFile)
+    dependsOn shadowJar
+}
+
+assemble.dependsOn shadowJar
 
 // configure the maven publication
 publishing {
