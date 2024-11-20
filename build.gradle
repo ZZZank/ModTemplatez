@@ -136,6 +136,8 @@ dependencies {
     }
 }
 
+apply from: 'gradle/scripts/dependencies.gradle'
+
 processResources {
 
     def filters = ['META-INF/mods.toml', 'pack.mcmeta']
