@@ -66,7 +66,8 @@ loom {
     forge {
         // specify the mixin configs used in this mod
         // this will be added to the jar manifest as well!
-        it.mixinConfigs("examplemod.mixins.json")
+        def mixins = propertyStringList('mixin_configs') as String[]
+        it.setMixinConfigs(mixins.collect {"${it}.json"})
 
         // missing access transformers?
         // don't worry, you can still use them!
@@ -207,6 +208,37 @@ String parserChangelog() {
     }
     return parsedChangelog
 }
+
+tasks.register('generateMixinJson') {
+    group 'custom helperz'
+    def missingConfig = propertyStringList('mixin_configs').findAll(config -> !file("src/main/resources/${config}.json").exists())
+    onlyIf {
+        return propertyBool('generate_mixins_json') && !missingConfig.empty
+    }
+    doLast {
+        def lines = """
+{
+    "package": "",
+    "required": true,
+    "refmap": "${mixin_refmap}",
+    "target": "@env(DEFAULT)",
+    "minVersion": "0.8",
+    "compatibilityLevel": "JAVA_8",
+    "mixins": [],
+    "server": [],
+    "client": [],
+    "injectors": {
+        "defaultRequire": 1
+    }
+}
+"""
+        for (String mixinConfig : missingConfig) {
+            file("src/main/resources/${mixinConfig}.json") << lines
+        }
+    }
+}
+
+processResources.dependsOn(generateMixinJson)
 
 apply from: 'gradle/scripts/publishing.gradle'
 
