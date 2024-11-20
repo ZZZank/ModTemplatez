@@ -4,9 +4,9 @@
 //
 // see ./gradle/scripts/dependencies.gradle for dependency management
 //
-// see ./gradle/scripts/dependencies.gradle for publishing
+// see ./gradle/scripts/publishing.gradle for publishing
 //
-// see ./gradle/scripts/dependencies.gradle for adding custom action after publishing
+// see ./gradle/scripts/extra.gradle for adding custom action after publishing
 //
 //
 //
@@ -183,7 +183,7 @@ jar {
 shadowJar {
     archiveClassifier.set("dev-shadow")
 
-    //here you can relocate packages
+    //here you can relocate packages, for example:
 //    relocate("io.github.classgraph", "zzzank.probejs.shaded.classgraph")
 
     configurations = [project.configurations.shade]
