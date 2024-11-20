@@ -85,6 +85,13 @@ configurations {
     implementation.extendsFrom shade
 }
 
+repositories {
+    maven {
+        name = 'ParchmentMC'
+        url = 'https://maven.parchmentmc.org'
+    }
+}
+
 dependencies {
     String mc_ver = propertyString("minecraft_version")
     String forge_ver = propertyString("forge_version")
