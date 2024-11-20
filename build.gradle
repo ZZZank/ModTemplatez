@@ -4,9 +4,9 @@
 //
 // see ./gradle/scripts/dependencies.gradle for dependency management
 //
+// see ./gradle/scripts/dependencies.gradle for publishing
 //
-//
-//
+// see ./gradle/scripts/dependencies.gradle for adding custom action after publishing
 //
 //
 //
@@ -15,22 +15,26 @@
 //
 //
 
+import org.jetbrains.changelog.Changelog
 
 plugins {
     id 'com.github.johnrengelman.shadow' version '8.1.1'
     id "dev.architectury.loom" version "1.7-SNAPSHOT"
     id "maven-publish"
     id "idea"
+    id 'com.matthewprenger.cursegradle' version '1.4.0' apply false //only used in CF publishing
+    id 'com.modrinth.minotaur' version '2.+' apply false //only used in Modrinth publishing
+    id 'org.jetbrains.changelog' version '2.2.0'
 }
 
 apply from: 'gradle/scripts/helpers.gradle'
 
 base {
-    archivesName = "${archives_base_name}-${minecraft_version}"
+    archivesName = "${propertyString('archives_base_name')}-${propertyString('minecraft_version')}"
 }
 
-version = project.mod_version
-group = project.maven_group
+version = propertyString('mod_version')
+group = propertyString('maven_group')
 
 def javaVer = Integer.valueOf(propertyString("base_java_version") as String)
 
@@ -68,17 +72,19 @@ configurations {
 }
 
 dependencies {
+    String mc_ver = propertyString("minecraft_version")
+    String forge_ver = propertyString("forge_version")
     // to change the versions see the gradle.properties file
-    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    minecraft "com.mojang:minecraft:${mc_ver}"
 
     // choose what mappings you want to use here
     // leave this uncommented if you want to use
     // mojang's official mappings, or feel free
     // to add your own mappings here (how about
     // mojmap layered with parchment, for example?)
-    def mappingType = "${mapping_type}"
+    String mappingType = propertyString("mapping_type")
     if (mappingType == "official") {
-        mappings loom.officialMojangMappings()
+        mappings(loom.officialMojangMappings())
     } else if (mappingType == 'parchment') {
         mappings(loom.layered {
             officialMojangMappings()
@@ -90,33 +96,32 @@ dependencies {
         throw new IllegalArgumentException("mapping type '${mappingType}' not one of: official, parchment, yarn")
     }
 
-    forge "net.minecraftforge:forge:${minecraft_version}-${project.forge_version}"
+    forge "net.minecraftforge:forge:${mc_ver}-${forge_ver}"
 
     if (propertyBool('use_lombok')) {
-        compileOnly("org.projectlombok:lombok:${lombok_version}")
-        annotationProcessor("org.projectlombok:lombok:${lombok_version}")
-        testCompileOnly("org.projectlombok:lombok:${lombok_version}")
-        testAnnotationProcessor("org.projectlombok:lombok:${lombok_version}")
+        def vers = propertyString("lombok_version")
+        compileOnly("org.projectlombok:lombok:${vers}")
+        annotationProcessor("org.projectlombok:lombok:${vers}")
+        testCompileOnly("org.projectlombok:lombok:${vers}")
+        testAnnotationProcessor("org.projectlombok:lombok:${vers}")
     }
 }
 
 processResources {
-    // define properties that can be used during resource processing
-    inputs.property("version", project.version)
 
     def filters = ['META-INF/mods.toml', 'pack.mcmeta']
 
     filesMatching(filters) { f ->
         f.expand(
-            "version": project.version,
-            "forge_version": forge_version,
-            "loader_version_range": loader_version_range,
-            "license": license,
-            "mod_id": mod_id,
-            "mod_display_name": mod_display_name,
-            "mod_author": mod_author,
-            "minecraft_version": minecraft_version,
-            "resource_pack_format": resource_pack_format
+            "version": propertyString('mod_version'),
+            "forge_version": propertyString('forge_version'),
+            "loader_version_range": propertyString('loader_version_range'),
+            "license": propertyString('license'),
+            "mod_id": propertyString('mod_id'),
+            "mod_display_name": propertyString('mod_display_name'),
+            "mod_author": propertyString('mod_author'),
+            "minecraft_version": propertyString('minecraft_version'),
+            "resource_pack_format": propertyString('resource_pack_format')
         )
     }
 }
@@ -190,4 +195,5 @@ String parserChangelog() {
 }
 
 apply from: 'gradle/scripts/publishing.gradle'
+
 apply from: 'gradle/scripts/extra.gradle'
