@@ -1,8 +1,8 @@
 // welcome
 //
+// ideally you don't need to touch this gradle script, instead:
+//
 // see ./gradle/scripts/dependencies.gradle for dependency management
-//
-//
 //
 //
 //
@@ -47,9 +47,7 @@ loom {
     forge {
         // specify the mixin configs used in this mod
         // this will be added to the jar manifest as well!
-        mixinConfigs = [
-            "examplemod.mixins.json"
-        ]
+        it.mixinConfigs("examplemod.mixins.json")
 
         // missing access transformers?
         // don't worry, you can still use them!
@@ -175,19 +173,18 @@ remapJar {
 
 assemble.dependsOn shadowJar
 
-// configure the maven publication
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-        }
+String parserChangelog() {
+    if (!file('CHANGELOG.md').exists()) {
+        throw new GradleException('publish_with_changelog is true, but CHANGELOG.md does not exist in the workspace!')
     }
-
-    // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
-    repositories {
-        // Add repositories to publish to here.
-        // Notice: This block does NOT have the same function as the block in the top level.
-        // The repositories here will be used for publishing your artifact, not for
-        // retrieving dependencies.
+    String parsedChangelog = changelog.renderItem(
+        changelog.get(propertyString('mod_version')).withHeader(false).withEmptySections(false),
+        Changelog.OutputType.MARKDOWN)
+    if (parsedChangelog.isEmpty()) {
+        throw new GradleException('publish_with_changelog is true, but the changelog for the latest version is empty!')
     }
+    return parsedChangelog
 }
+
+apply from: 'gradle/scripts/publishing.gradle'
+apply from: 'gradle/scripts/extra.gradle'
