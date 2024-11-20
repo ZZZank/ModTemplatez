@@ -32,8 +32,10 @@ base {
 version = project.mod_version
 group = project.maven_group
 
+def javaVer = Integer.valueOf(propertyString("base_java_version") as String)
+
 java {
-    sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = targetCompatibility = javaVer
 }
 
 loom {
@@ -102,10 +104,10 @@ processResources {
     // define properties that can be used during resource processing
     inputs.property("version", project.version)
 
-    // this will replace the property "${version}" in your mods.toml
-    // with the version you've defined in your gradle.properties
-    filesMatching("META-INF/mods.toml") {
-        expand(
+    def filters = ['META-INF/mods.toml', 'pack.mcmeta']
+
+    filesMatching(filters) { f ->
+        f.expand(
             "version": project.version,
             "forge_version": forge_version,
             "loader_version_range": loader_version_range,
@@ -113,7 +115,8 @@ processResources {
             "mod_id": mod_id,
             "mod_display_name": mod_display_name,
             "mod_author": mod_author,
-            "minecraft_version": minecraft_version
+            "minecraft_version": minecraft_version,
+            "resource_pack_format": resource_pack_format
         )
     }
 }
@@ -132,7 +135,7 @@ tasks.withType(JavaCompile) {
     // The Minecraft launcher currently installs Java 8 for users, so your mod probably wants to target Java 8 too
     // JDK 9 introduced a new way of specifying this that will make sure no newer classes or methods are used.
     // We'll use that if it's available, but otherwise we'll use the older option.
-    options.release = 8
+    options.release = javaVer
 }
 
 java {
