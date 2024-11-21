@@ -66,8 +66,7 @@ loom {
     forge {
         // specify the mixin configs used in this mod
         // this will be added to the jar manifest as well!
-        def mixins = propertyStringList('mixin_configs') as String[]
-        it.setMixinConfigs(mixins.collect {"${it}.json"})
+        it.mixinConfigs.set(propertyStringList('mixin_configs').collect {"${it}.json"})
 
         // missing access transformers?
         // don't worry, you can still use them!
@@ -142,8 +141,8 @@ processResources {
 
     def filters = ['META-INF/mods.toml', 'pack.mcmeta']
 
-    filesMatching(filters) { f ->
-        f.expand(
+    filesMatching(filters) {
+        it.expand(
             "version": propertyString('mod_version'),
             "forge_version": propertyString('forge_version'),
             "loader_version_range": propertyString('loader_version_range'),
@@ -211,7 +210,8 @@ String parserChangelog() {
     }
     String parsedChangelog = changelog.renderItem(
         changelog.get(propertyString('mod_version')).withHeader(false).withEmptySections(false),
-        Changelog.OutputType.MARKDOWN)
+        Changelog.OutputType.MARKDOWN
+    )
     if (parsedChangelog.isEmpty()) {
         throw new GradleException('publish_with_changelog is true, but the changelog for the latest version is empty!')
     }
@@ -225,11 +225,10 @@ tasks.register('generateMixinJson') {
         return propertyBool('generate_mixins_json') && !missingConfig.empty
     }
     doLast {
-        def lines = """
-{
+        def lines = """{
     "package": "",
     "required": true,
-    "refmap": "${mixin_refmap}",
+    "refmap": "${propertyString('mixin_refmap')}",
     "target": "@env(DEFAULT)",
     "minVersion": "0.8",
     "compatibilityLevel": "JAVA_8",
