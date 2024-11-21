@@ -112,8 +112,10 @@ dependencies {
         })
     } else if (mappingType == 'yarn') {
         mappings("net.fabricmc:yarn:${yarn_version}:v2")
+    } else if (mappingType == 'custom') {
+        mappings(propertyString('custom_mapping'))
     } else {
-        throw new IllegalArgumentException("mapping type '${mappingType}' not one of: official, parchment, yarn")
+        throw new IllegalArgumentException("mapping type '${mappingType}' not one of: official, parchment, yarn, custom")
     }
 
     forge "net.minecraftforge:forge:${mc_ver}-${forge_ver}"
