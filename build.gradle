@@ -230,7 +230,6 @@ tasks.register('generateMixinJson') {
         def lines = """{
     "package": "",
     "required": true,
-    "refmap": "${propertyString('mixin_refmap')}",
     "target": "@env(DEFAULT)",
     "minVersion": "0.8",
     "compatibilityLevel": "JAVA_8",
