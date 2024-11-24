@@ -95,11 +95,6 @@ loom {
         }
         accessWidenerPath = f
     }
-
-//    interfaceInjection {
-//        println("interfaceInjection enabled: ${it.enabled}")
-//        it.enableDependencyInterfaceInjection = true
-//    }
 }
 
 configurations {
@@ -202,13 +197,13 @@ jar {
     // add some additional metadata to the jar manifest
     manifest {
         attributes([
-                "Specification-Title"     : mod_id,
-                "Specification-Vendor"    : mod_author,
-                "Specification-Version"   : "1",
-                "Implementation-Title"    : mod_display_name,
-                "Implementation-Version"  : version,
-                "Implementation-Vendor"   : mod_author,
-                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+            "Specification-Title"     : mod_id,
+            "Specification-Vendor"    : mod_author,
+            "Specification-Version"   : "1",
+            "Implementation-Title"    : mod_display_name,
+            "Implementation-Version"  : version,
+            "Implementation-Vendor"   : mod_author,
+            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
     }
 }
@@ -224,10 +219,10 @@ shadowJar {
 
 remapJar {
     setInput(shadowJar.archiveFile)
-    dependsOn shadowJar
+    dependsOn(shadowJar)
 }
 
-assemble.dependsOn shadowJar
+assemble.dependsOn(shadowJar)
 
 String parserChangelog() {
     if (!file('CHANGELOG.md').exists()) {
