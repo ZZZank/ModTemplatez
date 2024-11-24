@@ -85,6 +85,19 @@ loom {
         // in SRG mapped ("func_" / "field_" with MCP class names) to work!
         // (both of these things may be subject to change in the future)
     }
+
+    if (propertyBool('use_access_widener')) {
+        def f = file("src/main/resources/${propertyString('access_widener_name')}.accesswidener")
+        if (!f.exists()) {
+            logger.warn("Configured AccessWidener not found")
+        }
+        accessWidenerPath = f
+    }
+
+//    interfaceInjection {
+//        println("interfaceInjection enabled: ${it.enabled}")
+//        it.enableDependencyInterfaceInjection = true
+//    }
 }
 
 configurations {
