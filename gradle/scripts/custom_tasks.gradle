@@ -33,7 +33,7 @@ tasks.register('generateMixinJson') {
 
 public void fnGenerateAccessWidenerBase() {
     File f = file("src/main/resources/${propertyString('access_widener_name')}.accesswidener")
-    if (!propertyBool('generate_access_widener') || f.exists()) {
+    if (!propertyBool('use_access_widener') || !propertyBool('generate_access_widener') || f.exists()) {
         return
     }
     def lines = """accessWidener v2 named
