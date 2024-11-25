@@ -2,7 +2,6 @@
 {
     "package": "com.example.examplemod.mixin",
     "required": true,
-    "refmap": "mixins.${mod_id}.refmap.json",
     "target": "@env(DEFAULT)",
     "minVersion": "0.8",
     "compatibilityLevel": "JAVA_8",
