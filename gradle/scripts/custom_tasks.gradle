@@ -2,7 +2,7 @@ apply from: 'gradle/scripts/helpers.gradle'
 
 public void fnGenerateMixinJson() {
     def missingConfig = propertyStringList('mixin_configs').findAll(config -> !file("src/main/resources/${config}.json").exists())
-    if (!propertyBool('generate_mixins_json') || missingConfig.empty) {
+    if (!propertyBool('use_mixin') || !propertyBool('generate_mixins_json') || missingConfig.empty) {
         return
     }
     def lines = """{

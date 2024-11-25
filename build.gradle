@@ -75,7 +75,9 @@ loom {
     forge {
         // specify the mixin configs used in this mod
         // this will be added to the jar manifest as well!
-        it.mixinConfigs.set(propertyStringList('mixin_configs').collect {"${it}.json"})
+        if (propertyBool('use_mixin')) {
+            it.mixinConfigs.set(propertyStringList('mixin_configs').collect {"${it}.json"})
+        }
 
         // missing access transformers?
         // don't worry, you can still use them!
