@@ -1,7 +1,7 @@
 
 # ModTemplatez
 
-An Architectury Loom based template workspace for Minecraft Forge mod targeting.
+An Architectury Loom based template workspace for Minecraft Forge mod development.
 
 This mod template is initially configured to provide support for 1.16 Forge mod developing, but you can easily change supported version by modifying `gradle.properties`
 
@@ -14,6 +14,7 @@ This mod template is initially configured to provide support for 1.16 Forge mod 
 - `shade` for Jar shadowing
 - preconfigured publishing tasks for publishing to Maven/CurseForge/Modrinth
 - mixin config auto generation
+- optional, pre-configured access widener
 - preconfigured dependency management, you can add dependencies in `./gradle/scripts/dependencies.gradle`
 - changelog generation
 
