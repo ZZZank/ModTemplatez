@@ -22,13 +22,18 @@ plugins {
     id "dev.architectury.loom" version "1.7-SNAPSHOT"
     id "maven-publish"
     id "idea"
-    id 'com.matthewprenger.cursegradle' version '1.4.0' apply false //only used in CF publishing
-    id 'com.modrinth.minotaur' version '2.+' apply false //only used in Modrinth publishing
+    id 'com.matthewprenger.cursegradle' version '1.4.0' apply false //only used for CF publishing
+    id 'com.modrinth.minotaur' version '2.+' apply false            //only used for Modrinth publishing
     id 'org.jetbrains.changelog' version '2.2.0'
+    id('xyz.wagyourtail.jvmdowngrader').version("${jvmdowngrader_version}").apply(false)
 }
 
 apply from: 'gradle/scripts/helpers.gradle'
 apply from: 'gradle/scripts/custom_tasks.gradle'
+
+if (propertyBool('use_jvmdowngrader')) {
+    apply plugin: 'xyz.wagyourtail.jvmdowngrader'
+}
 
 def props = project.properties
 def sysProps = System.getProperties()
@@ -45,13 +50,11 @@ base {
 version = propertyString('mod_version')
 group = propertyString('maven_group')
 
-def javaVer = Integer.valueOf(propertyString("target_java_version") as String)
+def javaTarget = Integer.valueOf(propertyString("target_java_version") as String)
 
 java {
-    if (propertyBool('use_jabel')) {
-        sourceCompatibility = targetCompatibility = 17
-    } else {
-        sourceCompatibility = targetCompatibility = javaVer
+    if (!propertyBool('use_jvmdowngrader')) {
+        sourceCompatibility = targetCompatibility = javaTarget
     }
 
     // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
@@ -147,14 +150,6 @@ dependencies {
         testCompileOnly("org.projectlombok:lombok:${vers}")
         testAnnotationProcessor("org.projectlombok:lombok:${vers}")
     }
-
-    if (propertyBool('use_jabel')) {
-        String distr = propertyString('jabel_distribution')
-        compileOnly(distr)
-        annotationProcessor(distr)
-        testCompileOnly(distr)
-        testAnnotationProcessor(distr)
-    }
 }
 
 apply from: 'gradle/scripts/dependencies.gradle'
@@ -192,7 +187,7 @@ tasks.withType(JavaCompile) {
     // The Minecraft launcher currently installs Java 8 for users, so your mod probably wants to target Java 8 too
     // JDK 9 introduced a new way of specifying this that will make sure no newer classes or methods are used.
     // We'll use that if it's available, but otherwise we'll use the older option.
-    options.release = javaVer
+//    options.release = javaTarget
 }
 
 jar {
@@ -220,11 +215,19 @@ shadowJar {
 }
 
 remapJar {
-    setInput(shadowJar.archiveFile)
+    if (propertyBool('use_jvmdowngrader')) {
+        setInput(downgradeJar.archiveFile)
+    } else {
+        setInput(shadowJar.archiveFile)
+    }
     dependsOn(shadowJar)
 }
 
-assemble.dependsOn(shadowJar)
+if (propertyBool('use_jvmdowngrader')) {
+    assemble.dependsOn(downgradeJar)
+} else {
+    assemble.dependsOn(shadowJar)
+}
 
 String parserChangelog() {
     if (!file('CHANGELOG.md').exists()) {
