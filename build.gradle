@@ -155,6 +155,13 @@ dependencies {
 apply from: 'gradle/scripts/dependencies.gradle'
 
 processResources {
+    if (!propertyBool("use_access_widener")) {
+        exclude("${propertyString('access_widener_name')}.accesswidener")
+    }
+
+    if (!propertyBool('use_mixin')) {
+        exclude(propertyStringList('mixin_configs').collect({"${it}.json"}))
+    }
 
     def filters = ['META-INF/mods.toml', 'pack.mcmeta']
 
