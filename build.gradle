@@ -18,22 +18,18 @@
 import org.jetbrains.changelog.Changelog
 
 plugins {
-    id 'com.github.johnrengelman.shadow' version '8.1.1'
-    id "dev.architectury.loom" version "1.7-SNAPSHOT"
-    id "maven-publish"
-    id "idea"
-    id 'com.matthewprenger.cursegradle' version '1.4.0' apply false //only used for CF publishing
-    id 'com.modrinth.minotaur' version '2.+' apply false            //only used for Modrinth publishing
-    id 'org.jetbrains.changelog' version '2.2.0'
+    id('com.github.johnrengelman.shadow').version('8.1.1')
+    id('dev.architectury.loom').version('1.7-SNAPSHOT')
+    id('maven-publish')
+    id('idea')
+    id('com.matthewprenger.cursegradle').version('1.4.0').apply(false) //only used for CF publishing
+    id('com.modrinth.minotaur').version('2.+').apply(false)            //only used for Modrinth publishing
+    id('org.jetbrains.changelog').version('2.2.0')
     id('xyz.wagyourtail.jvmdowngrader').version("${jvmdowngrader_version}").apply(false)
 }
 
 apply from: 'gradle/scripts/helpers.gradle'
 apply from: 'gradle/scripts/custom_tasks.gradle'
-
-if (propertyBool('use_jvmdowngrader')) {
-    apply plugin: 'xyz.wagyourtail.jvmdowngrader'
-}
 
 def props = project.properties
 def sysProps = System.getProperties()
@@ -41,7 +37,15 @@ def sysProps = System.getProperties()
 if (project.hasProperty("run_number")) {
     println("On GitHub runs #${props.run_number}")
 }
-println("Java: ${ -> sysProps['java.version']} | JVM: ${ -> sysProps['java.vm.version']} | Vendor: ${ -> sysProps['java.vendor']} | Architecture: ${ -> sysProps['os.arch']}")
+println("Gradle running on Java: ${ -> sysProps['java.version']} | JVM: ${ -> sysProps['java.vm.version']} | Vendor: ${ -> sysProps['java.vendor']} | Architecture: ${ -> sysProps['os.arch']}")
+
+def javaTarget = JavaVersion.toVersion(propertyString("target_java_version"))
+println("Target Java version is set to: ${javaTarget.majorVersion}")
+
+if (propertyBool('use_jvmdowngrader')) {
+    apply plugin: 'xyz.wagyourtail.jvmdowngrader'
+    jvmdg.downgradeTo = javaTarget
+}
 
 base {
     archivesName = "${propertyString('archives_base_name')}-${propertyString('minecraft_version')}"
@@ -49,8 +53,6 @@ base {
 
 version = propertyString('mod_version')
 group = propertyString('maven_group')
-
-def javaTarget = Integer.valueOf(propertyString("target_java_version") as String)
 
 java {
     if (!propertyBool('use_jvmdowngrader')) {
@@ -104,7 +106,7 @@ loom {
 
 configurations {
     shade
-    implementation.extendsFrom shade
+    implementation.extendsFrom(shade)
 }
 
 repositories {
@@ -115,17 +117,17 @@ repositories {
 }
 
 dependencies {
-    String mc_ver = propertyString("minecraft_version")
-    String forge_ver = propertyString("forge_version")
+    def mc_ver = propertyString("minecraft_version")
+    def forge_ver = propertyString("forge_version")
     // to change the versions see the gradle.properties file
-    minecraft "com.mojang:minecraft:${mc_ver}"
+    minecraft("com.mojang:minecraft:${mc_ver}")
 
     // choose what mappings you want to use here
     // leave this uncommented if you want to use
     // mojang's official mappings, or feel free
     // to add your own mappings here (how about
     // mojmap layered with parchment, for example?)
-    String mappingType = propertyString("mapping_type")
+    def mappingType = propertyString("mapping_type")
     if (mappingType == "official") {
         mappings(loom.officialMojangMappings())
     } else if (mappingType == 'parchment') {
@@ -141,7 +143,7 @@ dependencies {
         throw new IllegalArgumentException("mapping type '${mappingType}' not one of: official, parchment, yarn, custom")
     }
 
-    forge "net.minecraftforge:forge:${mc_ver}-${forge_ver}"
+    forge("net.minecraftforge:forge:${mc_ver}-${forge_ver}")
 
     if (propertyBool('use_lombok')) {
         def vers = propertyString("lombok_version")
