@@ -1,6 +1,7 @@
 package com.example.examplemod;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.world.item.BoatItem;
 import net.minecraft.world.item.Items;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.ExplosionEvent;
@@ -13,7 +14,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-@Mod("examplemod")
+@Mod("example_mod")
 public class ExampleMod {
 
     public static final Logger LOGGER = LogManager.getLogger();
@@ -42,6 +43,9 @@ public class ExampleMod {
     private void commonSetup(final FMLCommonSetupEvent event) {
         LOGGER.info("Hello from common setup! This is *after* registries are done, so we can do this:");
         LOGGER.info("Look, I found a {}!", Items.DIAMOND);
+        if (Items.ACACIA_BOAT instanceof BoatItem b) {
+            b.getDefaultInstance().exampleMod$doNothing();
+        }
     }
 
     private void clientSetup(final FMLClientSetupEvent event) {

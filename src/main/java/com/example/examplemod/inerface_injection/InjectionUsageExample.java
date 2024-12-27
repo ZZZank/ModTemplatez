@@ -13,15 +13,16 @@ public class InjectionUsageExample {
     /**
      * use this syntax if `architectury.common.json` is not used
      */
-    public static void clearTag(@NotNull ItemStack stack) {
+    public static void doNothing(@NotNull ItemStack stack) {
         val inject = (InjectItemStack) (Object) stack;
-        inject.exampleMod$clearTag();
+        inject.exampleMod$doNothing();
     }
 
     /**
-     *
+     * use this only when you're set up interface injection for your interface, which, in this case, is
+     * {@link InjectItemStack}
      */
-    public static void injectedClearTag(@NotNull ItemStack stack) {
-        stack.exampleMod$clearTag();
+    public static void injectedDoNothing(@NotNull ItemStack stack) {
+        stack.exampleMod$doNothing();
     }
 }
