@@ -74,6 +74,16 @@ loom {
     // and want loom to stop warning you about their license
     silentMojangMappingsLicense()
 
+
+    if (propertyBool('use_access_widener')) {
+        def f = file("src/main/resources/${propertyString('access_widener_name')}.accesswidener")
+        if (!f.exists()) {
+            logger.warn("Configured AccessWidener not found, force generating")
+            fnGenerateAccessWidenerBase()
+        }
+        accessWidenerPath = f
+    }
+
     // since loom 0.10, you are **required** to use the
     // "forge" block to configure forge-specific features,
     // such as the mixinConfigs array or datagen
@@ -84,23 +94,9 @@ loom {
             it.mixinConfigs.set(propertyStringList('mixin_configs').collect {"${it}.json"})
         }
 
-        // missing access transformers?
-        // don't worry, you can still use them!
-        // note that your AT *MUST* be located at
-        // src/main/resources/META-INF/accesstransformer.cfg
-        // to work as there is currently no config option to change this.
-        // also, any names used in your access transformer will need to be
-        // in SRG mapped ("func_" / "field_" with MCP class names) to work!
-        // (both of these things may be subject to change in the future)
-    }
-
-    if (propertyBool('use_access_widener')) {
-        File f = file("src/main/resources/${propertyString('access_widener_name')}.accesswidener")
-        if (!f.exists()) {
-            logger.warn("Configured AccessWidener not found, force generating")
-            fnGenerateAccessWidenerBase()
+        if (propertyBool('use_access_widener')) {
+            convertAccessWideners = true
         }
-        accessWidenerPath = f
     }
 }
 
