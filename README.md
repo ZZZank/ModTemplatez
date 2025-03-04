@@ -10,7 +10,7 @@ This mod template is initially configured to provide support for 1.16 Forge mod 
 - features from [Architectury Templates](https://github.com/architectury/architectury-templates), the base of this template.
 - variable autofilling for `mods.toml` and `pack.mcmeta`, preventing the hassle of locating every related names and renaming them
 - easy to use mapping selection: official, parchment, or yarn
-- use [Lombok](https://projectlombok.org/) and [Jabel](https://github.com/bsideup/jabel) by changing one value
+- preconfigured [Lombok](https://projectlombok.org/) and [JvmDowngrader](https://github.com/unimined/JvmDowngrader) that can be enabled/disabled easily
 - `shade` for Jar shadowing
 - preconfigured publishing tasks for publishing to Maven/CurseForge/Modrinth
 - mixin config auto generation
