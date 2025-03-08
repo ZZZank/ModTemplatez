@@ -1,3 +1,5 @@
+import java.nio.file.Files
+
 apply from: 'gradle/scripts/helpers.gradle'
 
 repositories {
@@ -70,4 +72,10 @@ dependencies {
     // Shadowing Jars
     // like this:
     // shade("mezz.jei:jei-1.16.5:${jei_version}")
+
+    file("./gradle/local_libs").eachFile {
+        if (it.isFile() && it.name.endsWith(".jar")) {
+            modImplementation(files(rootDir.relativePath(it)))
+        }
+    }
 }
