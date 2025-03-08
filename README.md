@@ -16,6 +16,7 @@ This mod template is initially configured to provide support for 1.16 Forge mod 
 - mixin config auto generation
 - optional, pre-configured access widener
 - preconfigured dependency management, you can add dependencies in `./gradle/scripts/dependencies.gradle`
+- easy local library setup, by adding Jar files to `gradle/local_libs`
 - changelog generation
 
 ## Changing target MC version
