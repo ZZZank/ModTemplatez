@@ -25,7 +25,7 @@ public void fnGenerateMixinJson() {
 }
 
 tasks.register('generateMixinJson') {
-    group 'custom helpers'
+    group = 'custom helpers'
     doLast {
         fnGenerateMixinJson()
     }
@@ -46,7 +46,7 @@ public void fnGenerateAccessWidenerBase() {
 }
 
 tasks.register('generateAccessWidenerBase') {
-    group 'custom helpers'
+    group = 'custom helpers'
     doLast {
         fnGenerateAccessWidenerBase()
     }

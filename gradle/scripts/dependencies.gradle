@@ -1,13 +1,11 @@
-import java.nio.file.Files
-
 apply from: 'gradle/scripts/helpers.gradle'
 
 repositories {
     exclusiveContent {
         forRepository {
             maven {
-                name 'CurseMaven'
-                url 'https://cursemaven.com'
+                name = 'CurseMaven'
+                url = 'https://cursemaven.com'
             }
         }
         filter {
@@ -17,8 +15,8 @@ repositories {
     exclusiveContent {
         forRepository {
             maven {
-                name 'Modrinth'
-                url 'https://api.modrinth.com/maven'
+                name = 'Modrinth'
+                url = 'https://api.modrinth.com/maven'
             }
         }
         filter {
