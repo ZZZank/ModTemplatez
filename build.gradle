@@ -168,6 +168,7 @@ processResources {
             "mod_id": propertyString('mod_id'),
             "mod_display_name": propertyString('mod_display_name'),
             "mod_author": propertyString('mod_author'),
+            "mod_description": propertyString('mod_description'),
             "minecraft_version": propertyString('minecraft_version'),
             "resource_pack_format": propertyString('resource_pack_format')
         )
