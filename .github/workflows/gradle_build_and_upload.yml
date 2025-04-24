@@ -40,7 +40,4 @@ jobs:
           name: Artifacts
           path: build/libs
 
-      - name: Run MC client
-        run: node ./.github/workflows/run_client.js
-
-      - run: sleep 1m
+      - run: timeout 10m ./gradlew runServer
