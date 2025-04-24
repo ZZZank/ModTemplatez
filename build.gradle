@@ -84,16 +84,7 @@ loom {
         accessWidenerPath = f
     }
 
-    // since loom 0.10, you are **required** to use the
-    // "forge" block to configure forge-specific features,
-    // such as the mixinConfigs array or datagen
     neoForge {
-        // specify the mixin configs used in this mod
-        // this will be added to the jar manifest as well!
-//        if (propertyBool('use_mixin')) {
-//            it.mixinConfigs.set(propertyStringList('mixin_configs').collect {"${it}.json"})
-//        }
-
         if (propertyBool('use_access_widener')) {
             convertAccessWideners = true
         }
@@ -161,7 +152,7 @@ processResources {
         exclude(propertyStringList('mixin_configs').collect({"${it}.json"}))
     }
 
-    def filters = ['META-INF/mods.toml', 'pack.mcmeta']
+    def filters = ['META-INF/neoforge.mods.toml', 'pack.mcmeta']
 
     filesMatching(filters) {
         it.expand(
@@ -214,6 +205,7 @@ remapJar {
     } else {
         setInput(shadowJar.archiveFile)
     }
+
     dependsOn(shadowJar)
 }
 
