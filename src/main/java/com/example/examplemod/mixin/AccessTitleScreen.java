@@ -1,7 +1,7 @@
 package com.example.examplemod.mixin;
 
+import net.minecraft.client.gui.components.SplashRenderer;
 import net.minecraft.client.gui.screens.TitleScreen;
-import net.minecraft.client.renderer.PanoramaRenderer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
@@ -11,6 +11,6 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 @Mixin(TitleScreen.class)
 public interface AccessTitleScreen {
 
-    @Accessor("panorama")
-    PanoramaRenderer exampleMod$panorama();
+    @Accessor("splash")
+    SplashRenderer exampleMod$panorama();
 }

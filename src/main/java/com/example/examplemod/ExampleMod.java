@@ -1,59 +1,94 @@
 package com.example.examplemod;
 
+import org.slf4j.Logger;
+
+import com.mojang.logging.LogUtils;
+
 import net.minecraft.client.Minecraft;
-import net.minecraft.world.item.BoatItem;
-import net.minecraft.world.item.Items;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.world.ExplosionEvent;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraft.world.level.block.Blocks;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
+import net.neoforged.neoforge.event.server.ServerStartingEvent;
 
-@Mod("example_mod")
+// The value here should match an entry in the META-INF/neoforge.mods.toml file
+@Mod(ExampleMod.MODID)
 public class ExampleMod {
+    // Define mod id in a common place for everything to reference
+    public static final String MODID = "example_mod";
+    // Directly reference a slf4j logger
+    public static final Logger LOGGER = LogUtils.getLogger();
 
-    public static final Logger LOGGER = LogManager.getLogger();
+    // The constructor for the mod class is the first code that is run when your mod is loaded.
+    // FML will recognize some parameter types like IEventBus or ModContainer and pass them in automatically.
+    public ExampleMod(IEventBus modEventBus, ModContainer modContainer) {
+        // Register the commonSetup method for modloading
+        modEventBus.addListener(this::commonSetup);
 
-    public ExampleMod() {
+        // Register the Deferred Register to the mod event bus so blocks get registered
+        ExampleRegistries.BLOCKS.register(modEventBus);
+        // Register the Deferred Register to the mod event bus so items get registered
+        ExampleRegistries.ITEMS.register(modEventBus);
+        // Register the Deferred Register to the mod event bus so tabs get registered
+        ExampleRegistries.CREATIVE_MODE_TABS.register(modEventBus);
 
-        // This is our mod's event bus, used for things like registry or lifecycle events
-        IEventBus MOD_BUS = FMLJavaModLoadingContext.get().getModEventBus();
+        // Register ourselves for server and other game events we are interested in.
+        // Note that this is necessary if and only if we want *this* class (ExampleMod) to respond directly to events.
+        // Do not add this line if there are no @SubscribeEvent-annotated functions in this class, like onServerStarting() below.
+        NeoForge.EVENT_BUS.register(this);
 
-        // This listener is fired on both client and server during setup.
-        MOD_BUS.addListener(this::commonSetup);
-        // This listener is only fired during client setup, so we can use client-side methods here.
-        MOD_BUS.addListener(this::clientSetup);
+        // Register the item to a creative tab
+        modEventBus.addListener(this::addCreative);
 
-        // Most other events are fired on Forge's bus.
-        // If we want to use annotations to register event listeners,
-        // we need to register our object like this!
-        MinecraftForge.EVENT_BUS.register(this);
-
-        // For more information on how to deal with events in Forge,
-        // like automatically subscribing an entire class to an event bus
-        // or using static methods to listen to events,
-        // feel free to check out the Forge wiki!
+        // Register our mod's ModConfigSpec so that FML can create and load the config file for us
+        modContainer.registerConfig(ModConfig.Type.COMMON, ExampleConfig.SPEC);
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
-        LOGGER.info("Hello from common setup! This is *after* registries are done, so we can do this:");
-        LOGGER.info("Look, I found a {}!", Items.DIAMOND);
-        if (Items.ACACIA_BOAT instanceof BoatItem b) {
-            b.getDefaultInstance().exampleMod$doNothing();
+        // Some common setup code
+        LOGGER.info("HELLO FROM COMMON SETUP");
+
+        if (ExampleConfig.logDirtBlock) {
+            LOGGER.info("DIRT BLOCK >> {}", BuiltInRegistries.BLOCK.getKey(Blocks.DIRT));
+        }
+
+        LOGGER.info("{}{}", ExampleConfig.magicNumberIntroduction, ExampleConfig.magicNumber);
+
+        ExampleConfig.items.forEach((item) -> LOGGER.info("ITEM >> {}", item.toString()));
+    }
+
+    // Add the example block item to the building blocks tab
+    private void addCreative(BuildCreativeModeTabContentsEvent event) {
+        if (event.getTabKey() == CreativeModeTabs.BUILDING_BLOCKS) {
+            event.accept(ExampleRegistries.EXAMPLE_BLOCK_ITEM);
         }
     }
 
-    private void clientSetup(final FMLClientSetupEvent event) {
-        LOGGER.info("Hey, we're on Minecraft version {}!", Minecraft.getInstance().getLaunchedVersion());
+    // You can use SubscribeEvent and let the Event Bus discover methods to call
+    @SubscribeEvent
+    public void onServerStarting(ServerStartingEvent event) {
+        // Do something when the server starts
+        LOGGER.info("HELLO from server starting");
     }
 
-    @SubscribeEvent
-    public void kaboom(ExplosionEvent.Detonate event) {
-        LOGGER.info("Kaboom! Something just blew up in {}!", event.getWorld());
+    // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent
+    @EventBusSubscriber(modid = MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+    public static class ClientModEvents {
+        @SubscribeEvent
+        public static void onClientSetup(FMLClientSetupEvent event) {
+            // Some client setup code
+            LOGGER.info("HELLO FROM CLIENT SETUP");
+            LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
+        }
     }
 }
