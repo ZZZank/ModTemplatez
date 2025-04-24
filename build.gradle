@@ -87,12 +87,12 @@ loom {
     // since loom 0.10, you are **required** to use the
     // "forge" block to configure forge-specific features,
     // such as the mixinConfigs array or datagen
-    forge {
+    neoForge {
         // specify the mixin configs used in this mod
         // this will be added to the jar manifest as well!
-        if (propertyBool('use_mixin')) {
-            it.mixinConfigs.set(propertyStringList('mixin_configs').collect {"${it}.json"})
-        }
+//        if (propertyBool('use_mixin')) {
+//            it.mixinConfigs.set(propertyStringList('mixin_configs').collect {"${it}.json"})
+//        }
 
         if (propertyBool('use_access_widener')) {
             convertAccessWideners = true
@@ -106,6 +106,10 @@ configurations {
 }
 
 repositories {
+    maven {
+        name = "Neoforged"
+        url = "https://maven.neoforged.net/releases/"
+    }
     maven {
         name = 'ParchmentMC'
         url = 'https://maven.parchmentmc.org'
@@ -135,7 +139,7 @@ dependencies {
         throw new IllegalArgumentException("mapping type '${mappingType}' not one of: official, parchment, yarn, custom")
     }
 
-    forge("net.minecraftforge:forge:${mc_ver}-${forge_ver}")
+    neoForge("net.neoforged:neoforge:${forge_ver}")
 
     if (propertyBool('use_lombok')) {
         def vers = propertyString("lombok_version")
