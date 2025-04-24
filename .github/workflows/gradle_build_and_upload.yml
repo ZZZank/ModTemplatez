@@ -42,6 +42,9 @@ jobs:
 
       - name: Setup Node
         uses: actions/setup-node@v4
+        with:
+          node-version: 23.x
+
       - name: Run MC client
         run: node .github/workflows/run_client.js
 
