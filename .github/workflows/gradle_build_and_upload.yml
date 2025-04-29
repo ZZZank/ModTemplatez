@@ -40,4 +40,3 @@ jobs:
           name: Artifacts
           path: build/libs
 
-      - run: timeout 10m ./gradlew runServer
