@@ -9,9 +9,7 @@ name: Java CI with Gradle
 
 on:
   push:
-    branches: [ "main" ]
   pull_request:
-    branches: [ "main" ]
 
 permissions:
   contents: read
@@ -38,5 +36,5 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: Artifacts
+          name: Artifacts-${{ github.ref_name }}
           path: build/libs
